@@ -27,6 +27,15 @@ echo -e "\n# PRIMARY PGs number per OSD sorted descending:"
 for OSD in $(ceph osd ls 2>/dev/null); do printf "osd.$OSD\tPGs number: " ; printf "% 3d\n" "$(cat $TMPF | grep "^$POOL_NUM\." | awk '{print $16}' | grep -w $OSD | wc -l)" ; done | sort -n -r -k 4,4
 rm $TMPF
 echo 
+
+if [[ "$POOL_NUM" -eq "" ]]; then
+  echo "ERROR: Did not find a pool named $POOL, exiting now."
+  echo 
+  echo "Usage: $0 [pool_name]" 
+  echo 
+  exit 2  
+fi
+
 SIZE=$(ceph osd dump 2>/dev/null | grep "pool $POOL_NUM" | awk '{ print $6 }')
 SORTC=$(( SIZE + 4 ))
 NDEVS=`ceph osd ls 2>/dev/null | wc -l`
